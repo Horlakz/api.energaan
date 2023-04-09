@@ -20,7 +20,7 @@ func InitializePlanRouter(router fiber.Router, dbConn database.DatabaseInterface
 	planRoutes := router.Group("/plans")
 
 	planRoutes.Get("/", planHandler.IndexHandle)
-	planRoutes.Post("/", middleware, planHandler.IndexHandle)
+	planRoutes.Post("/", middleware, planHandler.CreateHandle)
 	planRoutes.Get("/:slug", planHandler.ReadHandle)
 	planRoutes.Patch("/:slug", middleware, planHandler.UpdateHandle)
 	planRoutes.Delete("/:slug", middleware, planHandler.DeleteHandle)
