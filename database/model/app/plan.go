@@ -12,7 +12,7 @@ type Plan struct {
 	Title       string    `json:"title"`
 	Image       string    `json:"image"`
 	Description string    `json:"description"`
-	Price       uint      `json:"price"`
+	Price       int       `json:"price"`
 	CreatedByID uuid.UUID `gorm:"Column:created_by" json:"createdBy"`
 	UpdatedByID uuid.UUID `gorm:"Column:updated_by" json:"updatedBy"`
 	DeletedByID uuid.UUID `gorm:"Column:deleted_by" json:"deletedBy"`

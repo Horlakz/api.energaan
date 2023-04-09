@@ -12,7 +12,7 @@ type PlanDTO struct {
 	Title       string    `json:"title"`
 	Image       string    `json:"image"`
 	Description string    `json:"description"`
-	Price       uint      `json:"price"`
+	Price       int       `json:"price"`
 	CreatedByID uuid.UUID `json:"createdBy"`
 	UpdatedByID uuid.UUID `json:"updatedBy"`
 	DeletedByID uuid.UUID `json:"deletedBy"`
