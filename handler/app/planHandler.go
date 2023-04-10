@@ -1,7 +1,9 @@
 package app
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -23,6 +25,7 @@ type PlanHandlerInterface interface {
 
 type planHandler struct {
 	handler.BaseHandler
+	mediaHelper   helper.Media
 	planService   services.PlanServiceInterface
 	planValidator validators.PlanValidator
 }
@@ -58,12 +61,31 @@ func (handler *planHandler) CreateHandle(c *fiber.Ctx) (err error) {
 	userID, _ := handler.GetUserID(c)
 	planDto := new(dto.PlanDTO)
 
+	// collect fields and image file from request as multipart form
+	form, formErr := c.MultipartForm()
+
+	if formErr != nil {
+		resp.Status = http.StatusExpectationFailed
+		resp.Message = formErr.Error()
+
+		return c.Status(http.StatusBadRequest).JSON(resp)
+	}
+
+	// parse request body to dto
 	if err := c.BodyParser(planDto); err != nil {
 		resp.Status = http.StatusExpectationFailed
 		resp.Message = err.Error()
 
+		fmt.Print(err.Error(), "body parser")
+
 		return c.Status(http.StatusBadRequest).JSON(resp)
 	}
+
+	planDto.Image, _ = handler.mediaHelper.Save(c)
+	// get other fields from form
+	planDto.Title = form.Value["title"][0]
+	planDto.Description = form.Value["description"][0]
+	planDto.Price, _ = strconv.Atoi(form.Value["price"][0])
 
 	planDto.CreatedByID = userID
 	planDto.Slug = helper.CreateSlug(planDto.Title)
