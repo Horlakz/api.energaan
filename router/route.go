@@ -21,5 +21,5 @@ func InitializeRouter(router *fiber.App, dbConn database.DatabaseInterface) {
 	main.Get("/monitor", monitor.New(monitor.Config{Title: "Energaan API Monitor"}))
 
 	InitializeAuthRouter(main, dbConn)
-	InitializePlanRouter(router, dbConn)
+	InitializePlanRouter(main, dbConn)
 }
