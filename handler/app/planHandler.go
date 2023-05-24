@@ -3,7 +3,6 @@ package app
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -82,13 +81,23 @@ func (handler *planHandler) CreateHandle(c *fiber.Ctx) (err error) {
 	}
 
 	planDto.Image, _ = handler.mediaHelper.Save(c)
+
 	// get other fields from form
 	planDto.Title = form.Value["title"][0]
 	planDto.Description = form.Value["description"][0]
-	planDto.Price, _ = strconv.Atoi(form.Value["price"][0])
+	planDto.Features = form.Value["features"]
 
 	planDto.CreatedByID = userID
 	planDto.Slug = helper.CreateSlug(planDto.Title)
+
+	_, existErr := handler.planService.Read(planDto.Slug)
+
+	if existErr == nil {
+		resp.Status = http.StatusConflict
+		resp.Message = "Record Already Exist"
+
+		return c.Status(http.StatusConflict).JSON(resp)
+	}
 
 	vEs, err := handler.planValidator.Validate(*planDto)
 
@@ -144,16 +153,16 @@ func (handler *planHandler) ReadHandle(c *fiber.Ctx) (err error) {
 
 func (handler *planHandler) UpdateHandle(c *fiber.Ctx) (err error) {
 	var resp response.Response
-	userID, _ := handler.GetUserID(c)
+	userID, err := handler.GetUserID(c)
 
 	slug := c.Params("slug")
 
-	// if err != nil {
-	// 	resp.Status = http.StatusExpectationFailed
-	// 	resp.Message = "Exception Error: " + err.Error()
+	if err != nil {
+		resp.Status = http.StatusExpectationFailed
+		resp.Message = "Exception Error: " + err.Error()
 
-	// 	return c.Status(http.StatusExpectationFailed).JSON(resp)
-	// }
+		return c.Status(http.StatusExpectationFailed).JSON(resp)
+	}
 
 	planDto, err := handler.planService.Read(slug)
 	planDto.Slug = helper.CreateSlug(planDto.Title)
@@ -201,24 +210,24 @@ func (handler *planHandler) UpdateHandle(c *fiber.Ctx) (err error) {
 func (handler *planHandler) DeleteHandle(c *fiber.Ctx) (err error) {
 
 	var resp response.Response
-	userID, _ := handler.GetUserID(c)
+	userID, err := handler.GetUserID(c)
 
 	slug := c.Params("slug")
 
-	// if err != nil {
-	// 	resp.Status = http.StatusExpectationFailed
-	// 	resp.Message = "Exception Error: " + err.Error()
+	if err != nil {
+		resp.Status = http.StatusExpectationFailed
+		resp.Message = "Exception Error: " + err.Error()
 
-	// 	return c.Status(http.StatusExpectationFailed).JSON(resp)
-	// }
+		return c.Status(http.StatusExpectationFailed).JSON(resp)
+	}
 
-	// _, err := handler.planService.Read(slug)
+	_, existsErr := handler.planService.Read(slug)
 
-	// if err != nil {
-	// 	resp.Status = http.StatusNotFound
-	// 	resp.Message = "Record not found"
-	// 	return c.Status(http.StatusNotFound).JSON(resp)
-	// }
+	if existsErr != nil {
+		resp.Status = http.StatusNotFound
+		resp.Message = "Record not found"
+		return c.Status(http.StatusNotFound).JSON(resp)
+	}
 
 	if err := handler.planService.Delete(userID, slug); err != nil {
 		resp.Status = http.StatusInternalServerError
