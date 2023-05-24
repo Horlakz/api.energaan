@@ -32,7 +32,7 @@ func (service *planService) ConvertToDTO(plan planModel.Plan) planDto.PlanDTO {
 	planDTO.Title = plan.Title
 	planDTO.Image = plan.Image
 	planDTO.Description = plan.Description
-	planDTO.Price = plan.Price
+	planDTO.Features = plan.Features
 	planDTO.CreatedAt = plan.CreatedAt
 	planDTO.UpdatedAt = plan.UpdatedAt
 	planDTO.DeletedAt = plan.DeletedAt.Time
@@ -49,7 +49,7 @@ func (service *planService) ConvertToModel(planDTO planDto.PlanDTO) planModel.Pl
 	plan.Title = planDTO.Title
 	plan.Image = planDTO.Image
 	plan.Description = planDTO.Description
-	plan.Price = planDTO.Price
+	plan.Features = planDTO.Features
 	plan.CreatedAt = planDTO.CreatedAt
 	plan.UpdatedAt = planDTO.UpdatedAt
 	plan.DeletedAt.Time = planDTO.DeletedAt
