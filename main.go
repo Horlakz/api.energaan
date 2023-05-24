@@ -26,7 +26,7 @@ func main() {
 		fmt.Println("Loaded .env file")
 	}
 
-	app := fiber.New(fiber.Config{AppName: "Horlakz Email Service v0.0.1"})
+	app := fiber.New(fiber.Config{AppName: "Energaan v0.0.2"})
 
 	app.Use(recover.New())
 	app.Use(logger.New())
