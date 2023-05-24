@@ -17,13 +17,11 @@ func (validator *PlanValidator) Validate(planDto appDto.PlanDTO) (map[string]int
 	err := validation.ValidateStruct(&planDto,
 		validation.Field(&planDto.Slug,
 			validation.Required,
-			validation.Length(1, 32),
-			validation.By(validator.ValidateDBUnique(planDto, "plans", "slug", map[string]interface{}{})),
-		),
+			validation.Length(1, 32)),
 		validation.Field(&planDto.Title, validation.Required, validation.Length(1, 32)),
-		validation.Field(&planDto.Image, validation.Required, validation.Length(1, 32)),
+		validation.Field(&planDto.Image, validation.Required, validation.Length(1, 64)),
 		validation.Field(&planDto.Description, validation.Required),
-		validation.Field(&planDto.Price, validation.Required),
+		validation.Field(&planDto.Features, validation.Required),
 	)
 
 	if err != nil {
@@ -40,24 +38,4 @@ func (validator *PlanValidator) Validate(planDto appDto.PlanDTO) (map[string]int
 	}
 
 	return nil, nil
-}
-
-func (validator *PlanValidator) ValidateSlug(planDto appDto.PlanDTO) error {
-	err := validation.Validate(
-		&planDto.Slug,
-		validation.Required,
-		validation.Length(1, 32),
-		validation.By(validator.ValidateDBUnique(planDto, "plans", "slug", map[string]interface{}{})),
-	)
-
-	if err != nil {
-		if e, ok := err.(validation.InternalError); ok {
-			log.Println(e.InternalError())
-			return nil
-		}
-
-		return err
-	}
-
-	return nil
 }
