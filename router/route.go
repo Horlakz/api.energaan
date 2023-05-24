@@ -22,4 +22,5 @@ func InitializeRouter(router *fiber.App, dbConn database.DatabaseInterface) {
 
 	InitializeAuthRouter(main, dbConn)
 	InitializePlanRouter(main, dbConn)
+	InitializeCategoryRouter(main, dbConn)
 }
