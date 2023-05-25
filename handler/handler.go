@@ -89,3 +89,8 @@ func (h *BaseHandler) GeneratePageable(context *fiber.Ctx) (pageable repository.
 
 	return pageable
 }
+
+func StreamFile(c *fiber.Ctx) error {
+	file := c.Params("file")
+	return c.SendFile("./images/" + file)
+}
