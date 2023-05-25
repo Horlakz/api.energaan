@@ -15,6 +15,7 @@ func InitializeRouter(router *fiber.App, dbConn database.DatabaseInterface) {
 	})
 	// router.Get("*", handler.NotFound)
 	router.Get("/", handler.Index)
+	router.Get("/media/:file", handler.StreamFile)
 
 	main := router.Group("/api/v1")
 
@@ -26,4 +27,6 @@ func InitializeRouter(router *fiber.App, dbConn database.DatabaseInterface) {
 	InitializeProductRouter(main, dbConn)
 	InitializeFaqRouter(main, dbConn)
 	InitializeGalleryRouter(main, dbConn)
+	InitializeQuoteRouter(main, dbConn)
+	InitializeContactRouter(main, dbConn)
 }
