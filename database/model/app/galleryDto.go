@@ -16,5 +16,5 @@ type Gallery struct {
 }
 
 func (Gallery) TableName() string {
-	return "categories"
+	return "gallery"
 }

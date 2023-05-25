@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	databaseModule "github.com/horlakz/energaan-api/database"
@@ -9,10 +10,10 @@ import (
 
 type FaqRespositoryInterface interface {
 	Create(faq faqModel.Faq) (faqModel.Faq, error)
-	Read(slug string) (faqModel.Faq, error)
+	Read(id uuid.UUID) (faqModel.Faq, error)
 	ReadAll() ([]faqModel.Faq, error)
 	Update(faq faqModel.Faq) (faqModel.Faq, error)
-	Delete(slug string) error
+	Delete(id uuid.UUID) error
 }
 
 type FaqRepository struct {
@@ -35,8 +36,8 @@ func (repository *FaqRepository) Create(faq faqModel.Faq) (faqModel.Faq, error) 
 	return faq, nil
 }
 
-func (repository *FaqRepository) Read(slug string) (faq faqModel.Faq, err error) {
-	err = repository.database.Connection().Model(&faqModel.Faq{}).Where("slug = ?", slug).First(&faq).Error
+func (repository *FaqRepository) Read(id uuid.UUID) (faq faqModel.Faq, err error) {
+	err = repository.database.Connection().Model(&faqModel.Faq{}).Where("uuid = ?", id).First(&faq).Error
 
 	if err != nil {
 		return faq, err
@@ -82,10 +83,10 @@ func (repository *FaqRepository) Update(faq faqModel.Faq) (faqModel.Faq, error) 
 	return faq, nil
 }
 
-func (repository *FaqRepository) Delete(slug string) (err error) {
+func (repository *FaqRepository) Delete(id uuid.UUID) (err error) {
 	var faq faqModel.Faq
 
-	err = repository.database.Connection().Model(&faqModel.Faq{}).Where("slug = ?", slug).First(&faq).Error
+	err = repository.database.Connection().Model(&faqModel.Faq{}).Where("uuid = ?", id).First(&faq).Error
 
 	if err != nil {
 		return err

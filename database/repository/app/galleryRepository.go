@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	databaseModule "github.com/horlakz/energaan-api/database"
@@ -9,17 +10,17 @@ import (
 
 type GalleryRespositoryInterface interface {
 	Create(gallery galleryModel.Gallery) (galleryModel.Gallery, error)
-	Read(slug string) (galleryModel.Gallery, error)
+	Read(id uuid.UUID) (galleryModel.Gallery, error)
 	ReadAll() ([]galleryModel.Gallery, error)
 	Update(gallery galleryModel.Gallery) (galleryModel.Gallery, error)
-	Delete(slug string) error
+	Delete(id uuid.UUID) error
 }
 
 type GalleryRepository struct {
 	database databaseModule.DatabaseInterface
 }
 
-func NewgalleryRepository(database databaseModule.DatabaseInterface) GalleryRespositoryInterface {
+func NewGalleryRepository(database databaseModule.DatabaseInterface) GalleryRespositoryInterface {
 	return &GalleryRepository{database: database}
 }
 
@@ -35,8 +36,8 @@ func (repository *GalleryRepository) Create(gallery galleryModel.Gallery) (galle
 	return gallery, nil
 }
 
-func (repository *GalleryRepository) Read(slug string) (gallery galleryModel.Gallery, err error) {
-	err = repository.database.Connection().Model(&galleryModel.Gallery{}).Where("slug = ?", slug).First(&gallery).Error
+func (repository *GalleryRepository) Read(id uuid.UUID) (gallery galleryModel.Gallery, err error) {
+	err = repository.database.Connection().Model(&galleryModel.Gallery{}).Where("uuid = ?", id).First(&gallery).Error
 
 	if err != nil {
 		return gallery, err
@@ -82,10 +83,10 @@ func (repository *GalleryRepository) Update(gallery galleryModel.Gallery) (galle
 	return gallery, nil
 }
 
-func (repository *GalleryRepository) Delete(slug string) (err error) {
+func (repository *GalleryRepository) Delete(id uuid.UUID) (err error) {
 	var gallery galleryModel.Gallery
 
-	err = repository.database.Connection().Model(&galleryModel.Gallery{}).Where("slug = ?", slug).First(&gallery).Error
+	err = repository.database.Connection().Model(&galleryModel.Gallery{}).Where("uuid = ?", id).First(&gallery).Error
 
 	if err != nil {
 		return err
