@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -75,12 +74,12 @@ func (handler *planHandler) CreateHandle(c *fiber.Ctx) (err error) {
 		resp.Status = http.StatusExpectationFailed
 		resp.Message = err.Error()
 
-		fmt.Print(err.Error(), "body parser")
-
 		return c.Status(http.StatusBadRequest).JSON(resp)
 	}
 
-	planDto.Image, _ = handler.mediaHelper.Save(c)
+	fileNames, _ := handler.mediaHelper.Save(c)
+
+	planDto.Image = fileNames[0]
 
 	// get other fields from form
 	planDto.Title = form.Value["title"][0]
@@ -127,13 +126,6 @@ func (handler *planHandler) ReadHandle(c *fiber.Ctx) (err error) {
 	var resp response.Response
 
 	slug := c.Params("slug")
-
-	// if err != nil {
-	// 	resp.Status = http.StatusExpectationFailed
-	// 	resp.Message = "Exception Error: " + err.Error()
-
-	// 	return c.Status(http.StatusExpectationFailed).JSON(resp)
-	// }
 
 	planDto, err := handler.planService.Read(slug)
 
