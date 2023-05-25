@@ -35,7 +35,7 @@ func NewFaqHandler(faqService services.FaqServiceInterface) FaqHandlerInterface 
 
 func (handler *FaqHandler) IndexHandle(c *fiber.Ctx) (err error) {
 	var resp response.Response
-	categories, queryError := handler.faqService.ReadAll()
+	faqs, queryError := handler.faqService.ReadAll()
 
 	if queryError != nil {
 		resp.Status = http.StatusUnprocessableEntity
@@ -47,12 +47,12 @@ func (handler *FaqHandler) IndexHandle(c *fiber.Ctx) (err error) {
 	resp.Status = http.StatusOK
 	resp.Message = http.StatusText(http.StatusOK)
 
-	if len(categories) < 1 {
+	if len(faqs) < 1 {
 		resp.Data = map[string]interface{}{"result": []string{}}
 		return c.Status(http.StatusOK).JSON(resp)
 	}
 
-	resp.Data = map[string]interface{}{"result": categories}
+	resp.Data = map[string]interface{}{"result": faqs}
 	return c.Status(http.StatusOK).JSON(resp)
 
 }
