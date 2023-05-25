@@ -15,11 +15,11 @@ func InitializeRouter(router *fiber.App, dbConn database.DatabaseInterface) {
 	})
 	// router.Get("*", handler.NotFound)
 	router.Get("/", handler.Index)
-	router.Get("/media/:file", handler.StreamFile)
 
 	main := router.Group("/api/v1")
 
 	main.Get("/monitor", monitor.New(monitor.Config{Title: "Energaan API Monitor"}))
+	main.Get("/media/:file", handler.StreamFile)
 
 	InitializeAuthRouter(main, dbConn)
 	InitializePlanRouter(main, dbConn)
