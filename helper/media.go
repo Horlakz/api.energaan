@@ -19,21 +19,31 @@ func (m *Media) FileName(name string) string {
 	return fileName + postfix + "." + fileExt
 }
 
-func (m *Media) Save(c *fiber.Ctx) (string, error) {
+func (m *Media) Save(c *fiber.Ctx) ([]string, error) {
 	form, formErr := c.MultipartForm()
 
 	if formErr != nil {
-		return "", formErr
+		return []string{}, formErr
 	}
 
-	// get image file from form
-	file := form.File["image"][0]
+	// get image files from form
+	files := form.File["image"]
 
-	fileName := m.FileName(file.Filename)
-
-	if err := c.SaveFile(file, fmt.Sprintf("./images/%s", fileName)); err != nil {
-		return "", err
+	if len(files) == 0 {
+		return []string{}, fmt.Errorf("image is required")
 	}
 
-	return fileName, nil
+	fileNames := make([]string, len(files))
+
+	for i, file := range files {
+		fileNames[i] = m.FileName(file.Filename)
+	}
+
+	for i, file := range files {
+		if err := c.SaveFile(file, fmt.Sprintf("./images/%s", fileNames[i])); err != nil {
+			return []string{}, err
+		}
+	}
+
+	return fileNames, nil
 }
