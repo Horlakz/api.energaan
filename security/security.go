@@ -24,7 +24,7 @@ func CreateToken(userID string) (string, error) {
 	claims["sub"] = userID
 	claims["iat"] = time.Now().Unix()
 	claims["ver"] = 1
-	claims["exp"] = time.Now().Add(time.Minute * 30).Unix()
+	claims["exp"] = time.Now().Add(time.Hour * 6).Unix()
 
 	_token, err := token.SignedString([]byte(JWT_KEY))
 
