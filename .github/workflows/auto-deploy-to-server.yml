@@ -1,0 +1,41 @@
+name: Deploy to server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Generate .env file
+        uses: SpicyPizza/create-envfile@v1.3
+        with:
+          envkey_DB_HOST: ${{ secrets.DB_HOST }}
+          envkey_DB_USER: ${{ secrets.DB_USER }}
+          envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          envkey_DB_NAME: ${{ secrets.DB_NAME }}
+
+          file_name: .env
+          fail_on_empty: false
+
+      - name: Build Docker images
+        run: |
+          docker build . -t energaan:${{ github.sha }}
+
+  run_app:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: remove running container
+        run: |
+          docker rm --force energaan-api
+
+      - name: Run Docker images
+        run: |
+          docker run -d --restart unless-stopped -p 4300:8000 --name energaan-api energaan:${{ github.sha }}
