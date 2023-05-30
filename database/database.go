@@ -20,14 +20,15 @@ type connection struct {
 }
 
 func StartDatabaseClient() DatabaseInterface {
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	dbname := os.Getenv("DB_NAME")
-	password := os.Getenv("DB_PASSWORD")
+	// host := os.Getenv("DB_HOST")
+	// port := os.Getenv("DB_PORT")
+	// user := os.Getenv("DB_USER")
+	// dbname := os.Getenv("DB_NAME")
+	// password := os.Getenv("DB_PASSWORD")
 
-	dsn := "host=" + host + " user=" + user + " password=" + password + " dbname=" + dbname + " port=" + port
-	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	// dsn := "host=" + host + " user=" + user + " password=" + password + " dbname=" + dbname + " port=" + port
+
+	database, err := gorm.Open(postgres.Open(os.Getenv("DB_DSN")), &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true})
 
