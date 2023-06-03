@@ -16,9 +16,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+type MediaInterface interface {
+	Save(c *fiber.Ctx) ([]string, error)
+	UploadToAWSS3(fileName string) error
+	GetObjectFromS3(fileName string) (*s3.GetObjectOutput, error)
+}
+
 type Media struct{}
 
-func NewMediaHelper() *Media {
+func NewMediaHelper() MediaInterface {
 	return &Media{}
 }
 
