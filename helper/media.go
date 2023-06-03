@@ -1,9 +1,11 @@
 package helper
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"log"
+	"io"
+	"mime/multipart"
 	"os"
 	"strconv"
 	"strings"
@@ -18,7 +20,7 @@ import (
 
 type MediaInterface interface {
 	Save(c *fiber.Ctx) ([]string, error)
-	UploadToAWSS3(fileName string) error
+	UploadToAWSS3(file *multipart.FileHeader) (string, error)
 	GetObjectFromS3(fileName string) (*s3.GetObjectOutput, error)
 }
 
@@ -80,9 +82,26 @@ func (m *Media) Save(c *fiber.Ctx) ([]string, error) {
 	return fileNames, nil
 }
 
-func (m *Media) UploadToAWSS3(filename string) error {
+func (m *Media) UploadToAWSS3(file *multipart.FileHeader) (string, error) {
+	fileOpen, openErr := file.Open()
+
+	if openErr != nil {
+		return "", openErr
+	}
+
+	defer fileOpen.Close()
+
+	fileContent := bytes.NewBuffer(nil)
+
+	_, copyErr := io.Copy(fileContent, fileOpen)
+
+	if copyErr != nil {
+		return "", copyErr
+	}
+
+	fileName := m.FileName(file.Filename)
 	timeout := time.Duration(5 * time.Second)
-	key := os.Getenv("AWS_BUCKET_BASE_FOLDER") + "/" + m.FileName(filename)
+	key := os.Getenv("AWS_BUCKET_BASE_FOLDER") + "/" + fileName
 	bucket, session := AWSConfig()
 
 	svc := s3.New(session)
@@ -92,25 +111,18 @@ func (m *Media) UploadToAWSS3(filename string) error {
 
 	defer cancelFn()
 
-	file, openErr := os.Open(fmt.Sprintf("./images/%s", filename))
-
-	if openErr != nil {
-		log.Fatal(openErr)
-		return openErr
-	}
-
 	// Uploads the object to S3. The Context will interrupt the request if the
 	// timeout expires.
 	_, err := svc.PutObjectWithContext(ctx, &s3.PutObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String(key),
-		Body:   file,
+		Body:   bytes.NewReader(fileContent.Bytes()),
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return fileName, nil
 }
 
 func (m *Media) GetObjectFromS3(key string) (*s3.GetObjectOutput, error) {
