@@ -23,7 +23,7 @@ type PlanHandlerInterface interface {
 
 type planHandler struct {
 	handler.BaseHandler
-	mediaHelper   helper.Media
+	mediaHelper   helper.MediaInterface
 	planService   services.PlanServiceInterface
 	planValidator validators.PlanValidator
 }

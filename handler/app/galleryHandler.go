@@ -23,7 +23,7 @@ type GalleryHandlerInterface interface {
 
 type galleryHandler struct {
 	handler.BaseHandler
-	mediaHelper      helper.Media
+	mediaHelper      helper.MediaInterface
 	galleryService   services.GalleryServiceInterface
 	galleryValidator validators.GalleryValidator
 }
@@ -83,6 +83,15 @@ func (handler *galleryHandler) CreateHandle(c *fiber.Ctx) (err error) {
 	}
 
 	fileNames, _ := handler.mediaHelper.Save(c)
+
+	uploadErr := handler.mediaHelper.UploadToAWSS3(fileNames[0])
+
+	if uploadErr != nil {
+		resp.Status = http.StatusExpectationFailed
+		resp.Message = uploadErr.Error()
+
+		return c.Status(http.StatusBadRequest).JSON(resp)
+	}
 
 	galleryDTO.Image = fileNames[0]
 	galleryDTO.Title = form.Value["title"][0]

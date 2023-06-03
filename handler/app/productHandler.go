@@ -25,7 +25,7 @@ type ProductHandlerInterface interface {
 
 type productHandler struct {
 	handler.BaseHandler
-	mediaHelper      helper.Media
+	mediaHelper      helper.MediaInterface
 	productService   services.ProductServiceInterface
 	productValidator validators.ProductValidator
 }
