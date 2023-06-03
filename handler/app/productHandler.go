@@ -100,6 +100,10 @@ func (handler *productHandler) CreateHandle(c *fiber.Ctx) (err error) {
 
 	fileNames, _ := handler.mediaHelper.Save(c)
 
+	for _, filename := range fileNames {
+		handler.mediaHelper.UploadToAWSS3(filename)
+	}
+
 	// save image file to dto
 	productDto.Images = fileNames
 
