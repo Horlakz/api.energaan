@@ -79,6 +79,15 @@ func (handler *planHandler) CreateHandle(c *fiber.Ctx) (err error) {
 
 	fileNames, _ := handler.mediaHelper.Save(c)
 
+	uploadErr := handler.mediaHelper.UploadToAWSS3(fileNames[0])
+
+	if uploadErr != nil {
+		resp.Status = http.StatusExpectationFailed
+		resp.Message = uploadErr.Error()
+
+		return c.Status(http.StatusBadRequest).JSON(resp)
+	}
+
 	planDto.Image = fileNames[0]
 
 	// get other fields from form
