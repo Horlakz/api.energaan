@@ -76,7 +76,7 @@ func (m *Media) Save(c *fiber.Ctx) ([]string, error) {
 
 func (m *Media) UploadToAWSS3(filename string) error {
 	timeout := time.Duration(5 * time.Second)
-	key := "energaan/" + m.FileName(filename)
+	key := os.Getenv("AWS_BUCKET_BASE_FOLDER") + "/" + m.FileName(filename)
 	bucket, session := AWSConfig()
 
 	svc := s3.New(session)
@@ -115,7 +115,7 @@ func (m *Media) GetObjectFromS3(key string) (*s3.GetObjectOutput, error) {
 	// Downloads the object to a file
 	obj, err := svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(bucket),
-		Key:    aws.String(key),
+		Key:    aws.String(os.Getenv("AWS_BUCKET_BASE_FOLDER") + "/" + key),
 	})
 
 	if err != nil {
