@@ -21,6 +21,11 @@ jobs:
           envkey_DB_PORT: ${{ secrets.DB_PORT }}
           envkey_DB_NAME: ${{ secrets.DB_NAME }}
           envkey_DB_DSN: ${{ secrets.DB_DSN }}
+          envkey_AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+          envkey_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+          envkey_AWS_BUCKET_REGION: ${{ secrets.AWS_BUCKET_REGION }}
+          envkey_AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
+          envkey_AWS_BUCKET_BASE_FOLDER: ${{ secrets.DB_DSN }}
 
           file_name: .env
           fail_on_empty: false
