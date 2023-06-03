@@ -112,10 +112,12 @@ func (m *Media) GetObjectFromS3(key string) (*s3.GetObjectOutput, error) {
 
 	svc := s3.New(session)
 
+	var objectKey string = fmt.Sprintf(os.Getenv("AWS_BUCKET_BASE_FOLDER") + "/" + key)
+
 	// Downloads the object to a file
 	obj, err := svc.GetObject(&s3.GetObjectInput{
 		Bucket: aws.String(bucket),
-		Key:    aws.String(os.Getenv("AWS_BUCKET_BASE_FOLDER") + "/" + key),
+		Key:    aws.String(objectKey),
 	})
 
 	if err != nil {
