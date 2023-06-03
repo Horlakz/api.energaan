@@ -98,10 +98,12 @@ func (handler *productHandler) CreateHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusBadRequest).JSON(resp)
 	}
 
-	fileNames, _ := handler.mediaHelper.Save(c)
+	images := form.File["image"]
+	fileNames := make([]string, len(images))
+	mediaHelper := helper.NewMediaHelper()
 
-	for _, filename := range fileNames {
-		err := handler.mediaHelper.UploadToAWSS3(filename)
+	for i, image := range images {
+		fileNames[i], err = mediaHelper.UploadToAWSS3(image)
 
 		if err != nil {
 			resp.Status = http.StatusExpectationFailed

@@ -77,9 +77,10 @@ func (handler *planHandler) CreateHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusBadRequest).JSON(resp)
 	}
 
-	fileNames, _ := handler.mediaHelper.Save(c)
+	image := form.File["image"][0]
+	mediaHelper := helper.NewMediaHelper()
 
-	uploadErr := handler.mediaHelper.UploadToAWSS3(fileNames[0])
+	fileName, uploadErr := mediaHelper.UploadToAWSS3(image)
 
 	if uploadErr != nil {
 		resp.Status = http.StatusExpectationFailed
@@ -88,7 +89,7 @@ func (handler *planHandler) CreateHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusBadRequest).JSON(resp)
 	}
 
-	planDto.Image = fileNames[0]
+	planDto.Image = fileName
 
 	// get other fields from form
 	planDto.Title = form.Value["title"][0]
