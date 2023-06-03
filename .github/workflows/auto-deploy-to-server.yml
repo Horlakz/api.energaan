@@ -25,7 +25,7 @@ jobs:
           envkey_AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
           envkey_AWS_BUCKET_REGION: ${{ secrets.AWS_BUCKET_REGION }}
           envkey_AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME }}
-          envkey_AWS_BUCKET_BASE_FOLDER: ${{ secrets.DB_DSN }}
+          envkey_AWS_BUCKET_BASE_FOLDER: ${{ secrets.AWS_BUCKET_BASE_FOLDER }}
 
           file_name: .env
           fail_on_empty: false
