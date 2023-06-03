@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -8,6 +11,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/horlakz/energaan-api/database/repository"
+	"github.com/horlakz/energaan-api/helper"
 	"github.com/horlakz/energaan-api/payload/response"
 	"github.com/horlakz/energaan-api/security"
 )
@@ -93,4 +97,33 @@ func (h *BaseHandler) GeneratePageable(context *fiber.Ctx) (pageable repository.
 func StreamFile(c *fiber.Ctx) error {
 	file := c.Params("file")
 	return c.SendFile("./images/" + file)
+}
+
+func StreamFileFromAwsS3(c *fiber.Ctx) error {
+	obj := c.Params("key")
+	var resp response.Response
+
+	media := helper.NewMediaHelper()
+
+	file, getErr := media.GetObjectFromS3(obj)
+
+	if getErr != nil {
+		log.Println("Error getting S3 file:", getErr)
+		resp.Status = http.StatusUnprocessableEntity
+		resp.Message = fmt.Sprintf("Error getting S3 file: %s", getErr.Error())
+		return c.Status(http.StatusNotFound).JSON(resp)
+	}
+
+	c.Set(fiber.HeaderContentType, *file.ContentType)
+	c.Set(fiber.HeaderContentLength, strconv.FormatInt(*file.ContentLength, 10))
+
+	_, err := io.Copy(c, file.Body)
+
+	if err != nil {
+		resp.Status = http.StatusUnprocessableEntity
+		resp.Message = fmt.Sprintf("Error streaming S3 file: %s", err.Error())
+		return c.Status(http.StatusNotFound).JSON(resp)
+	}
+
+	return nil
 }
