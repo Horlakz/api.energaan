@@ -90,7 +90,7 @@ func (handler *productHandler) CreateHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusBadRequest).JSON(resp)
 	}
 
-	// parse request body to dto
+	// // parse request body to dto
 	if err := c.BodyParser(productDto); err != nil {
 		resp.Status = http.StatusExpectationFailed
 		resp.Message = err.Error()
@@ -98,6 +98,24 @@ func (handler *productHandler) CreateHandle(c *fiber.Ctx) (err error) {
 		fmt.Print(err.Error(), "body parser")
 
 		return c.Status(http.StatusBadRequest).JSON(resp)
+	}
+
+	// validate category id
+	productDto.CategoryID, err = uuid.Parse(form.Value["categoryId"][0])
+	if err != nil {
+		resp.Status = http.StatusUnprocessableEntity
+		resp.Message = err.Error()
+
+		return c.Status(http.StatusUnprocessableEntity).JSON(resp)
+	}
+
+	_, err = handler.categoryService.ReadByUUID(productDto.CategoryID)
+
+	if err != nil {
+		resp.Status = http.StatusUnprocessableEntity
+		resp.Message = "Category Does Not Exist"
+
+		return c.Status(http.StatusUnprocessableEntity).JSON(resp)
 	}
 
 	images := form.File["image"]
@@ -120,18 +138,10 @@ func (handler *productHandler) CreateHandle(c *fiber.Ctx) (err error) {
 
 	// get other fields from form
 	productDto.Title = form.Value["title"][0]
-	productDto.CategoryID, err = uuid.Parse(form.Value["categoryId"][0])
 	productDto.Description = form.Value["description"][0]
 	productDto.Features = form.Value["features"]
-
 	productDto.CreatedByID = userID
 	productDto.Slug = helper.CreateSlug(productDto.Title)
-
-	if err != nil {
-		resp.Status = http.StatusUnprocessableEntity
-		resp.Message = err.Error()
-	}
-
 	_, existErr := handler.productService.Read(productDto.Slug)
 
 	if existErr == nil {
