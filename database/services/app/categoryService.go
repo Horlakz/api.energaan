@@ -15,6 +15,7 @@ type categoryService struct {
 type CategoryServiceInterface interface {
 	Create(category categoryDto.CategoryDTO) (categoryDto.CategoryDTO, error)
 	Read(slug string) (categoryDto.CategoryDTO, error)
+	ReadByUUID(uuid uuid.UUID) (categoryDto.CategoryDTO, error)
 	ReadAll() ([]categoryDto.CategoryDTO, error)
 	Update(category categoryDto.CategoryDTO) (categoryDto.CategoryDTO, error)
 	Delete(userUUID uuid.UUID, slug string) error
@@ -61,6 +62,12 @@ func (service *categoryService) Create(categoryDTO categoryDto.CategoryDTO) (cat
 
 func (service *categoryService) Read(slug string) (categoryDto.CategoryDTO, error) {
 	record, err := service.categoryRepository.Read(slug)
+
+	return service.ConvertToDTO(record), err
+}
+
+func (service *categoryService) ReadByUUID(uuid uuid.UUID) (categoryDto.CategoryDTO, error) {
+	record, err := service.categoryRepository.ReadByUUID(uuid)
 
 	return service.ConvertToDTO(record), err
 }

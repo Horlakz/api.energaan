@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	databaseModule "github.com/horlakz/energaan-api/database"
@@ -10,6 +11,7 @@ import (
 type CategoryRespositoryInterface interface {
 	Create(category categoryModel.Category) (categoryModel.Category, error)
 	Read(slug string) (categoryModel.Category, error)
+	ReadByUUID(uuid uuid.UUID) (categoryModel.Category, error)
 	ReadAll() ([]categoryModel.Category, error)
 	Update(category categoryModel.Category) (categoryModel.Category, error)
 	Delete(slug string) error
@@ -37,6 +39,16 @@ func (repository *categoryRepository) Create(category categoryModel.Category) (c
 
 func (repository *categoryRepository) Read(slug string) (category categoryModel.Category, err error) {
 	err = repository.database.Connection().Model(&categoryModel.Category{}).Where("slug = ?", slug).First(&category).Error
+
+	if err != nil {
+		return category, err
+	}
+
+	return category, nil
+}
+
+func (repository *categoryRepository) ReadByUUID(uuid uuid.UUID) (category categoryModel.Category, err error) {
+	err = repository.database.Connection().Model(&categoryModel.Category{}).Where("uuid = ?", uuid).First(&category).Error
 
 	if err != nil {
 		return category, err
