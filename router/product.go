@@ -13,9 +13,11 @@ import (
 func InitializeProductRouter(router fiber.Router, dbConn database.DatabaseInterface) {
 	middleware := middleware.Protected()
 	productRepository := repositories.NewProductRepository(dbConn)
+	categoryRepository := repositories.NewCategoryRepository(dbConn)
 	productService := services.NewProductService(productRepository)
+	categoryService := services.NewCategoryService(categoryRepository)
 
-	productHandler := handlers.NewProductHandler(productService)
+	productHandler := handlers.NewProductHandler(productService, categoryService)
 
 	productRoutes := router.Group("/products")
 
