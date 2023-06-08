@@ -25,8 +25,9 @@ type ProductHandlerInterface interface {
 
 type productHandler struct {
 	handler.BaseHandler
-	mediaHelper      helper.MediaInterface
+	// mediaHelper      helper.MediaInterface
 	productService   services.ProductServiceInterface
+	categoryService  services.CategoryServiceInterface
 	productValidator validators.ProductValidator
 }
 
@@ -184,9 +185,18 @@ func (handler *productHandler) ReadHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusNotFound).JSON(resp)
 	}
 
+	categoryDto, err := handler.categoryService.ReadByUUID(productDto.CategoryID)
+
+	if err != nil {
+		resp.Status = http.StatusNotFound
+		resp.Message = "Record Not Found"
+
+		return c.Status(http.StatusNotFound).JSON(resp)
+	}
+
 	resp.Status = http.StatusOK
 	resp.Message = http.StatusText(http.StatusOK)
-	resp.Data = map[string]interface{}{"product": productDto}
+	resp.Data = map[string]interface{}{"product": productDto, "category": categoryDto}
 
 	return c.Status(200).JSON(resp)
 }
