@@ -31,9 +31,10 @@ type productHandler struct {
 	productValidator validators.ProductValidator
 }
 
-func NewProductHandler(productService services.ProductServiceInterface) ProductHandlerInterface {
+func NewProductHandler(productService services.ProductServiceInterface, categoryService services.CategoryServiceInterface) ProductHandlerInterface {
 	return &productHandler{
-		productService: productService,
+		productService:  productService,
+		categoryService: categoryService,
 	}
 }
 
@@ -169,13 +170,6 @@ func (handler *productHandler) ReadHandle(c *fiber.Ctx) (err error) {
 
 	slug := c.Params("slug")
 
-	// if err != nil {
-	// 	resp.Status = http.StatusExpectationFailed
-	// 	resp.Message = "Exception Error: " + err.Error()
-
-	// 	return c.Status(http.StatusExpectationFailed).JSON(resp)
-	// }
-
 	productDto, err := handler.productService.Read(slug)
 
 	if err != nil {
@@ -189,7 +183,7 @@ func (handler *productHandler) ReadHandle(c *fiber.Ctx) (err error) {
 
 	if err != nil {
 		resp.Status = http.StatusNotFound
-		resp.Message = "Record Not Found"
+		resp.Message = "Product Category is invalid"
 
 		return c.Status(http.StatusNotFound).JSON(resp)
 	}
