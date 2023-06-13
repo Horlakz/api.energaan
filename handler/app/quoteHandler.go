@@ -14,6 +14,11 @@ import (
 	validators "github.com/horlakz/energaan-api/validator/app"
 )
 
+type Result struct {
+	Quote   dto.QuoteDTO `json:"quote"`
+	Service interface{}  `json:"serviceDetails"`
+}
+
 type QuoteHandlerInterface interface {
 	IndexHandle(c *fiber.Ctx) error
 	CreateHandle(c *fiber.Ctx) error
@@ -24,12 +29,16 @@ type QuoteHandlerInterface interface {
 type QuoteHandler struct {
 	handler.BaseHandler
 	quoteService   services.QuoteServiceInterface
+	productService services.ProductServiceInterface
+	planService    services.PlanServiceInterface
 	quoteValidator validators.QuoteValidator
 }
 
-func NewQuoteHandler(quoteService services.QuoteServiceInterface) QuoteHandlerInterface {
+func NewQuoteHandler(quoteService services.QuoteServiceInterface, productService services.ProductServiceInterface, planService services.PlanServiceInterface) QuoteHandlerInterface {
 	return &QuoteHandler{
-		quoteService: quoteService,
+		quoteService:   quoteService,
+		productService: productService,
+		planService:    planService,
 	}
 }
 
@@ -45,9 +54,40 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusUnprocessableEntity).JSON(resp)
 	}
 
+	results := make([]Result, len(quotes))
+
+	// create a new object of response, loop through the quotes, check the serviceType, if type is product, call productService.ReadByUUID, if type is plan, call planService.ReadByUUID and attach the result to the quote object
+	for i, quote := range quotes {
+		if quote.ServiceType == "product" {
+			product, err := handler.productService.ReadByUUID(quote.ServiceId)
+
+			if err != nil {
+				resp.Status = http.StatusUnprocessableEntity
+				resp.Message = err.Error()
+
+				return c.Status(http.StatusUnprocessableEntity).JSON(resp)
+			}
+
+			results[i].Quote = quote
+			results[i].Service = product
+		} else if quote.ServiceType == "plan" {
+			plan, err := handler.planService.ReadByUUID(quote.ServiceId)
+
+			if err != nil {
+				resp.Status = http.StatusUnprocessableEntity
+				resp.Message = err.Error()
+
+				return c.Status(http.StatusUnprocessableEntity).JSON(resp)
+			}
+
+			results[i].Quote = quote
+			results[i].Service = plan
+		}
+	}
+
 	resp.Status = http.StatusOK
 	resp.Message = http.StatusText(http.StatusOK)
-	resp.Data = map[string]interface{}{"result": quotes, "totalPages": pagination.TotalPages, "totalItems": pagination.TotalItems, "currentPage": pagination.CurrentPage}
+	resp.Data = map[string]interface{}{"result": results, "totalPages": pagination.TotalPages, "totalItems": pagination.TotalItems, "currentPage": pagination.CurrentPage}
 
 	return c.Status(http.StatusOK).JSON(resp)
 
