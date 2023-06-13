@@ -14,9 +14,13 @@ func InitializeQuoteRouter(router fiber.Router, dbConn database.DatabaseInterfac
 	middleware := middleware.Protected()
 
 	quoteRepository := repositories.NewQuoteRepository(dbConn)
+	productRepository := repositories.NewProductRepository(dbConn)
+	planRepository := repositories.NewPlanRepository(dbConn)
 	quoteService := services.NewQuoteService(quoteRepository)
+	productService := services.NewProductService(productRepository)
+	planService := services.NewPlanService(planRepository)
 
-	quoteHandler := handlers.NewQuoteHandler(quoteService)
+	quoteHandler := handlers.NewQuoteHandler(quoteService, productService, planService)
 
 	quoteRoutes := router.Group("/quotes")
 
