@@ -24,6 +24,7 @@ func InitializeProductRouter(router fiber.Router, dbConn database.DatabaseInterf
 	productRoutes.Get("/", productHandler.IndexHandle)
 	productRoutes.Post("/", middleware, productHandler.CreateHandle)
 	productRoutes.Get("/:slug", productHandler.ReadHandle)
+	productRoutes.Get("/id/:id", productHandler.ReadByUUIDHandle)
 	productRoutes.Patch("/:slug", middleware, productHandler.UpdateHandle)
 	productRoutes.Delete("/:slug", middleware, productHandler.DeleteHandle)
 }

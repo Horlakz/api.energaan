@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 
 	dto "github.com/horlakz/energaan-api/database/dto/app"
 	services "github.com/horlakz/energaan-api/database/services/app"
@@ -17,6 +18,7 @@ type PlanHandlerInterface interface {
 	IndexHandle(c *fiber.Ctx) error
 	CreateHandle(c *fiber.Ctx) error
 	ReadHandle(c *fiber.Ctx) error
+	ReadByUUIDHandle(c *fiber.Ctx) error
 	UpdateHandle(c *fiber.Ctx) error
 	DeleteHandle(c *fiber.Ctx) error
 }
@@ -137,6 +139,27 @@ func (handler *planHandler) ReadHandle(c *fiber.Ctx) (err error) {
 	slug := c.Params("slug")
 
 	planDto, err := handler.planService.Read(slug)
+
+	if err != nil {
+		resp.Status = http.StatusNotFound
+		resp.Message = "Record Not Found"
+
+		return c.Status(http.StatusNotFound).JSON(resp)
+	}
+
+	resp.Status = http.StatusOK
+	resp.Message = http.StatusText(http.StatusOK)
+	resp.Data = map[string]interface{}{"plan": planDto}
+
+	return c.Status(200).JSON(resp)
+}
+
+func (handler *planHandler) ReadByUUIDHandle(c *fiber.Ctx) (err error) {
+	var resp response.Response
+
+	id := c.Params("id")
+
+	planDto, err := handler.planService.ReadByUUID(uuid.MustParse(id))
 
 	if err != nil {
 		resp.Status = http.StatusNotFound

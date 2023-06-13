@@ -16,6 +16,7 @@ type productService struct {
 type ProductServiceInterface interface {
 	Create(product productDto.ProductDTO) (productDto.ProductDTO, error)
 	Read(slug string) (productDto.ProductDTO, error)
+	ReadByUUID(uuid uuid.UUID) (productDto.ProductDTO, error)
 	ReadAll(pageable repository.Pageable, categoryId uuid.UUID) ([]productDto.ProductDTO, repository.Pagination, error)
 	Update(product productDto.ProductDTO) (productDto.ProductDTO, error)
 	Delete(userUUID uuid.UUID, slug string) error
@@ -70,6 +71,12 @@ func (service *productService) Create(productDTO productDto.ProductDTO) (product
 
 func (service *productService) Read(slug string) (productDto.ProductDTO, error) {
 	record, err := service.productRepository.Read(slug)
+
+	return service.ConvertToDTO(record), err
+}
+
+func (service *productService) ReadByUUID(uuid uuid.UUID) (productDto.ProductDTO, error) {
+	record, err := service.productRepository.ReadByUUID(uuid)
 
 	return service.ConvertToDTO(record), err
 }

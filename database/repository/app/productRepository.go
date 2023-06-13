@@ -15,6 +15,7 @@ import (
 type ProductRespositoryInterface interface {
 	Create(product productModel.Product) (productModel.Product, error)
 	Read(slug string) (productModel.Product, error)
+	ReadByUUID(uuid uuid.UUID) (productModel.Product, error)
 	ReadAll(pageable repository.Pageable, categoryId uuid.UUID) ([]productModel.Product, repository.Pagination, error)
 	Update(product productModel.Product) (productModel.Product, error)
 	Delete(slug string) error
@@ -42,6 +43,16 @@ func (repository *productRepository) Create(product productModel.Product) (produ
 
 func (repository *productRepository) Read(slug string) (product productModel.Product, err error) {
 	err = repository.database.Connection().Model(&productModel.Product{}).Where("slug = ?", slug).First(&product).Error
+
+	if err != nil {
+		return product, err
+	}
+
+	return product, nil
+}
+
+func (repository *productRepository) ReadByUUID(uuid uuid.UUID) (product productModel.Product, err error) {
+	err = repository.database.Connection().Model(&productModel.Product{}).Where("uuid = ?", uuid).First(&product).Error
 
 	if err != nil {
 		return product, err

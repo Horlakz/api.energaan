@@ -16,6 +16,7 @@ type planService struct {
 type PlanServiceInterface interface {
 	Create(plan planDto.PlanDTO) (planDto.PlanDTO, error)
 	Read(slug string) (planDto.PlanDTO, error)
+	ReadByUUID(uuid uuid.UUID) (planDto.PlanDTO, error)
 	ReadAll(pageable repository.Pageable) ([]planDto.PlanDTO, repository.Pagination, error)
 	Update(plan planDto.PlanDTO) (planDto.PlanDTO, error)
 	Delete(userUUID uuid.UUID, slug string) error
@@ -68,6 +69,12 @@ func (service *planService) Create(planDTO planDto.PlanDTO) (planDto.PlanDTO, er
 
 func (service *planService) Read(slug string) (planDto.PlanDTO, error) {
 	record, err := service.planRepository.Read(slug)
+
+	return service.ConvertToDTO(record), err
+}
+
+func (service *planService) ReadByUUID(uuid uuid.UUID) (planDto.PlanDTO, error) {
+	record, err := service.planRepository.ReadByUUID(uuid)
 
 	return service.ConvertToDTO(record), err
 }

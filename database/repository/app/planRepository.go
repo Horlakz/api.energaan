@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 
 	databaseModule "github.com/horlakz/energaan-api/database"
@@ -14,6 +15,7 @@ import (
 type PlanRespositoryInterface interface {
 	Create(plan planModel.Plan) (planModel.Plan, error)
 	Read(slug string) (planModel.Plan, error)
+	ReadByUUID(uuid uuid.UUID) (planModel.Plan, error)
 	ReadAll(pageable repository.Pageable) ([]planModel.Plan, repository.Pagination, error)
 	Update(plan planModel.Plan) (planModel.Plan, error)
 	Delete(slug string) error
@@ -41,6 +43,16 @@ func (repository *planRepository) Create(plan planModel.Plan) (planModel.Plan, e
 
 func (repository *planRepository) Read(slug string) (plan planModel.Plan, err error) {
 	err = repository.database.Connection().Model(&planModel.Plan{}).Where("slug = ?", slug).First(&plan).Error
+
+	if err != nil {
+		return plan, err
+	}
+
+	return plan, nil
+}
+
+func (repository *planRepository) ReadByUUID(uuid uuid.UUID) (plan planModel.Plan, err error) {
+	err = repository.database.Connection().Model(&planModel.Plan{}).Where("uuid = ?", uuid).First(&plan).Error
 
 	if err != nil {
 		return plan, err
