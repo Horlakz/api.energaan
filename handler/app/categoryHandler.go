@@ -17,7 +17,7 @@ import (
 
 type CategoryResult struct {
 	Category         dto.CategoryDTO `json:"category"`
-	CreatedByDetails interface{}     `json:"createdByDetails"`
+	CreatedByDetails string          `json:"createdByDetails"`
 }
 
 type CategoryHandlerInterface interface {
@@ -69,7 +69,7 @@ func (handler *categoryHandler) IndexHandle(c *fiber.Ctx) (err error) {
 
 		results[i] = CategoryResult{
 			Category:         category,
-			CreatedByDetails: createdByDetails,
+			CreatedByDetails: createdByDetails.FullName,
 		}
 	}
 
