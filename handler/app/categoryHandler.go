@@ -7,12 +7,18 @@ import (
 
 	dto "github.com/horlakz/energaan-api/database/dto/app"
 	services "github.com/horlakz/energaan-api/database/services/app"
+	userService "github.com/horlakz/energaan-api/database/services/auth"
 	"github.com/horlakz/energaan-api/handler"
 	"github.com/horlakz/energaan-api/helper"
 	categoryRequest "github.com/horlakz/energaan-api/payload/request/app/category"
 	"github.com/horlakz/energaan-api/payload/response"
 	validators "github.com/horlakz/energaan-api/validator/app"
 )
+
+type CategoryResult struct {
+	Category         dto.CategoryDTO `json:"category"`
+	CreatedByDetails interface{}     `json:"createdByDetails"`
+}
 
 type CategoryHandlerInterface interface {
 	IndexHandle(c *fiber.Ctx) error
@@ -24,12 +30,17 @@ type CategoryHandlerInterface interface {
 type categoryHandler struct {
 	handler.BaseHandler
 	categoryService   services.CategoryServiceInterface
+	userService       userService.UserServiceInterface
 	categoryValidator validators.CategoryValidator
 }
 
-func NewCategoryHandler(categoryService services.CategoryServiceInterface) CategoryHandlerInterface {
+func NewCategoryHandler(
+	categoryService services.CategoryServiceInterface,
+	userService userService.UserServiceInterface,
+) CategoryHandlerInterface {
 	return &categoryHandler{
 		categoryService: categoryService,
+		userService:     userService,
 	}
 }
 
@@ -44,6 +55,24 @@ func (handler *categoryHandler) IndexHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusUnprocessableEntity).JSON(resp)
 	}
 
+	results := make([]CategoryResult, len(categories))
+
+	for i, category := range categories {
+		createdByDetails, err := handler.userService.Read(category.CreatedByID)
+
+		if err != nil {
+			resp.Status = http.StatusUnprocessableEntity
+			resp.Message = err.Error()
+
+			return c.Status(http.StatusUnprocessableEntity).JSON(resp)
+		}
+
+		results[i] = CategoryResult{
+			Category:         category,
+			CreatedByDetails: createdByDetails,
+		}
+	}
+
 	resp.Status = http.StatusOK
 	resp.Message = http.StatusText(http.StatusOK)
 
@@ -52,7 +81,7 @@ func (handler *categoryHandler) IndexHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusOK).JSON(resp)
 	}
 
-	resp.Data = map[string]interface{}{"result": categories}
+	resp.Data = map[string]interface{}{"result": results}
 	return c.Status(http.StatusOK).JSON(resp)
 
 }
