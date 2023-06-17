@@ -7,7 +7,6 @@ import (
 
 	authDtos "github.com/horlakz/energaan-api/database/dto/auth"
 	authModels "github.com/horlakz/energaan-api/database/model/auth"
-	"github.com/horlakz/energaan-api/database/repository"
 	authRepos "github.com/horlakz/energaan-api/database/repository/auth"
 	"github.com/horlakz/energaan-api/helper"
 )
@@ -20,9 +19,9 @@ type userService struct {
 type UserServiceInterface interface {
 	Create(userDTO authDtos.UserDTO) (authDtos.UserDTO, error)
 	Read(uid uuid.UUID) (authDtos.UserDTO, error)
-	ReadAll(pageable repository.Pageable) ([]authDtos.UserDTO, repository.Pagination, error)
-	Update(userDTO authDtos.UserDTO) (authDtos.UserDTO, error)
-	Delete(userUUID uuid.UUID, uid uuid.UUID) error
+	// ReadAll(pageable repository.Pageable) ([]authDtos.UserDTO, repository.Pagination, error)
+	// Update(userDTO authDtos.UserDTO) (authDtos.UserDTO, error)
+	// Delete(userUUID uuid.UUID, uid uuid.UUID) error
 	FindByEmail(email string) (authDtos.UserDTO, error)
 	Authenticate(email string, password string) (*authDtos.UserDTO, error)
 }
@@ -68,31 +67,31 @@ func (service *userService) Read(uid uuid.UUID) (authDtos.UserDTO, error) {
 	return service.ConvertToDTO(record), err
 }
 
-func (service *userService) ReadAll(pageable repository.Pageable) (recordsDto []authDtos.UserDTO, pagination repository.Pagination, err error) {
-	records, pagination, err := service.userRepository.ReadAll(pageable)
+// func (service *userService) ReadAll(pageable repository.Pageable) (recordsDto []authDtos.UserDTO, pagination repository.Pagination, err error) {
+// 	records, pagination, err := service.userRepository.ReadAll(pageable)
 
-	for _, record := range records {
-		recordsDto = append(recordsDto, service.ConvertToDTO(record))
-	}
+// 	for _, record := range records {
+// 		recordsDto = append(recordsDto, service.ConvertToDTO(record))
+// 	}
 
-	return recordsDto, pagination, err
-}
+// 	return recordsDto, pagination, err
+// }
 
-func (service *userService) Update(userDTO authDtos.UserDTO) (authDtos.UserDTO, error) {
-	user := service.ConvertToModel(userDTO)
-	newRecord, err := service.userRepository.Update(user)
+// func (service *userService) Update(userDTO authDtos.UserDTO) (authDtos.UserDTO, error) {
+// 	user := service.ConvertToModel(userDTO)
+// 	newRecord, err := service.userRepository.Update(user)
 
-	return service.ConvertToDTO(newRecord), err
-}
+// 	return service.ConvertToDTO(newRecord), err
+// }
 
-func (service *userService) Delete(userUUID uuid.UUID, uid uuid.UUID) (err error) {
-	rtn := service.userRepository.Delete(uid)
-	record, _ := service.userRepository.Read(uid)
+// func (service *userService) Delete(userUUID uuid.UUID, uid uuid.UUID) (err error) {
+// 	rtn := service.userRepository.Delete(uid)
+// 	record, _ := service.userRepository.Read(uid)
 
-	service.userRepository.Update(record)
+// 	service.userRepository.Update(record)
 
-	return rtn
-}
+// 	return rtn
+// }
 
 func (service *userService) FindByEmail(email string) (authDtos.UserDTO, error) {
 	record, err := service.userRepository.FindByEmail(email)
