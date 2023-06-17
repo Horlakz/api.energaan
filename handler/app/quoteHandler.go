@@ -14,7 +14,7 @@ import (
 	validators "github.com/horlakz/energaan-api/validator/app"
 )
 
-type Result struct {
+type QuoteResult struct {
 	Quote   dto.QuoteDTO `json:"quote"`
 	Service interface{}  `json:"serviceDetails"`
 }
@@ -54,7 +54,7 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 		return c.Status(http.StatusUnprocessableEntity).JSON(resp)
 	}
 
-	results := make([]Result, len(quotes))
+	results := make([]QuoteResult, len(quotes))
 
 	// create a new object of response, loop through the quotes, check the serviceType, if type is product, call productService.ReadByUUID, if type is plan, call planService.ReadByUUID and attach the result to the quote object
 	for i, quote := range quotes {
