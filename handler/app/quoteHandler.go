@@ -91,7 +91,12 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 
 	resp.Status = http.StatusOK
 	resp.Message = http.StatusText(http.StatusOK)
-	resp.Data = map[string]interface{}{"result": results, "totalPages": pagination.TotalPages, "totalItems": pagination.TotalItems, "currentPage": pagination.CurrentPage}
+	resp.Data = map[string]interface{}{
+		"result":      results,
+		"totalPages":  pagination.TotalPages,
+		"totalItems":  pagination.TotalItems,
+		"currentPage": pagination.CurrentPage,
+	}
 
 	return c.Status(http.StatusOK).JSON(resp)
 
