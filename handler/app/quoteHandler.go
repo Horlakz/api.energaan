@@ -34,7 +34,11 @@ type QuoteHandler struct {
 	quoteValidator validators.QuoteValidator
 }
 
-func NewQuoteHandler(quoteService services.QuoteServiceInterface, productService services.ProductServiceInterface, planService services.PlanServiceInterface) QuoteHandlerInterface {
+func NewQuoteHandler(
+	quoteService services.QuoteServiceInterface,
+	productService services.ProductServiceInterface,
+	planService services.PlanServiceInterface,
+) QuoteHandlerInterface {
 	return &QuoteHandler{
 		quoteService:   quoteService,
 		productService: productService,

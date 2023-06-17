@@ -32,7 +32,10 @@ type productHandler struct {
 	productValidator validators.ProductValidator
 }
 
-func NewProductHandler(productService services.ProductServiceInterface, categoryService services.CategoryServiceInterface) ProductHandlerInterface {
+func NewProductHandler(
+	productService services.ProductServiceInterface,
+	categoryService services.CategoryServiceInterface,
+) ProductHandlerInterface {
 	return &productHandler{
 		productService:  productService,
 		categoryService: categoryService,
