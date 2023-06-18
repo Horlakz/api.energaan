@@ -68,6 +68,7 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 			if err != nil {
 				results[i].Quote = quote
 				results[i].Service = nil
+				continue
 			}
 
 			results[i].Quote = quote
@@ -78,6 +79,7 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 			if err != nil {
 				results[i].Quote = quote
 				results[i].Service = nil
+				continue
 			}
 
 			results[i].Quote = quote
