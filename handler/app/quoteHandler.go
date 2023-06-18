@@ -66,10 +66,7 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 			product, err := handler.productService.ReadByUUID(quote.ServiceId)
 
 			if err != nil {
-				resp.Status = http.StatusUnprocessableEntity
-				resp.Message = err.Error()
-
-				return c.Status(http.StatusUnprocessableEntity).JSON(resp)
+				continue
 			}
 
 			results[i].Quote = quote
@@ -78,10 +75,7 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 			plan, err := handler.planService.ReadByUUID(quote.ServiceId)
 
 			if err != nil {
-				resp.Status = http.StatusUnprocessableEntity
-				resp.Message = err.Error()
-
-				return c.Status(http.StatusUnprocessableEntity).JSON(resp)
+				continue
 			}
 
 			results[i].Quote = quote
