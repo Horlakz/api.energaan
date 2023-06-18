@@ -66,7 +66,8 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 			product, err := handler.productService.ReadByUUID(quote.ServiceId)
 
 			if err != nil {
-				continue
+				results[i].Quote = quote
+				results[i].Service = nil
 			}
 
 			results[i].Quote = quote
@@ -75,7 +76,8 @@ func (handler *QuoteHandler) IndexHandle(c *fiber.Ctx) (err error) {
 			plan, err := handler.planService.ReadByUUID(quote.ServiceId)
 
 			if err != nil {
-				continue
+				results[i].Quote = quote
+				results[i].Service = nil
 			}
 
 			results[i].Quote = quote
