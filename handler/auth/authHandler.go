@@ -91,7 +91,7 @@ func (handler *authHandler) RegisterHandle(c *fiber.Ctx) error {
 
 	if verr != nil {
 		resp.Status = http.StatusUnprocessableEntity
-		resp.Message = "Validation Error"
+		resp.Message = "Invalid Form Data"
 		resp.Data = vEs
 
 		return c.Status(http.StatusUnprocessableEntity).JSON(resp)
